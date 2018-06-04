@@ -4,15 +4,15 @@ title: "Names in Python"
 date: 2018-06-02
 categories: Python
 ---
-# What's in a name?
-In most traditional languages, variable are named memory locations that can store values. For example, given the following sequence:
+# What's in a variable?
+In most traditional languages, variable are named memory locations that can store values. A statement like ```variable = value``` stores the value into the memory location represented by variable. For example, given the following sequence:
 {% highlight c %}
 a = 1;
 a = 2;
 {% endhighlight %}
-In a language like C, the first line stores the value **1** in a memory location referenced by the name **a**, and the second line update the value to **2** in that same memory location. But this is not how things work in Python.
+In a language like C, the first line puts the value **1** in a memory location referenced by the name **a**, and the second line update the value to **2** in that same memory location. But this is not how things work in Python.
 
-**In Python, a variable is a name used to refer to an object stored somewhere in memory.** In the same sequence above, the first line makes **a** points to/refer to the object with value **1**, and the second line points the variable **a** to an object with value **2**.
+**In Python, a variable is a name used to refer to an object stored somewhere in memory.**  The same statement ```variable = value``` decides which object(value) the name is going to refer to. In the same sequence above, the first line makes **a** points to to the object with value **1**, and the second line points the variable **a** to an object with value **2**.
 
 We can easily verify this by using the built-in functions ```id()``` and ```is```. Conceptually, ```id()``` returns the memory address of an object, and ```is``` check to see if two objects have the same id (aka in the same memory address, instead of check for equal value as ```==``` does).
 
@@ -48,6 +48,17 @@ print a
 #=> [0, 2, 3]
 {% endhighlight %}
 
+Here is a nice practical summary:
+{% highlight python %}
+B = A
+if A is immutable:    # int, string, tuple, ...
+    if B changes:  A does not change
+if A is mutable:      # list, dict, ...
+    if B is modified in place:  A also changes
+    elif B is rebinded to something else:  A does not change
+{% endhighlight %}
+
+
 # Names as function arguments
 A related question is whether function arguments are passed by value or by reference in Python. Well, they are passed by value, but since the names are themselves just references, it is a little more complicated.
 
@@ -77,8 +88,6 @@ print x
 #=> [0]
 {% endhighlight %}
 
-# The ```=``` operator
-Another way to understand the concepts is to rethink what the ```=``` operator does. In a language like C, the statement ```variable = value``` stores the **value** into the memory location represented by **variable**. In Python, what the same statement does is like puting a **variable** label  on the object that is **value**.
 
 
 

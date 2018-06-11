@@ -88,9 +88,32 @@ print x
 #=> [0]
 {% endhighlight %}
 
+# A bit about application
+What if we insist on changing the value of an immutable object passed to a function? Surely this could be useful in some circumstances, right? Well, there are two ways to work around that in Python. The first one is to simply ```return``` a value from within the function and rebind it outside. To illustrate:
 
+{% highlight python %}
+def change(immutable):
+    immutable = 'abc'
+    return immutable
+
+str = 'a'
+str = change(str)   
+{% endhighlight %} 
+
+This is IMO the better and more readable way. The other method is to transform an immutable object to a mutable one before we make changes to it. 
+{% highlight python %}
+def change(something):
+    something[0] = 'abc'
+    
+str = 'a'    
+str_dummy = [str]
+change(str_dummy)
+do_something_with(str_dummy[0])
+{% endhighlight %}
+
+As you can see, this is pretty ugly. It's only included here for the purpose of completeness, please don't use it in your code.
 
 
 Disclaimer:
-> This post is migrated from my github account, where I used to keep study notes. The content is taken from various online resources, mostly stackoverflow. I don't claim to have thought of them myself.
+> This post is migrated from my github account, where I used to keep study notes. The content is taken from various online resources, mostly stackoverflow. I don't claim to have come up with it myself.
 

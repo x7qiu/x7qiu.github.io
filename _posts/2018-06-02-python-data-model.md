@@ -10,9 +10,9 @@ In most traditional languages, variable are named memory locations that can stor
 a = 1;
 a = 2;
 {% endhighlight %}
-In a language like C, the first line puts the value **1** in a memory location referenced by the name **a**, and the second line update the value to **2** in that same memory location. But this is not how things work in Python.
+In a language like C, the first line puts the value ```1``` in a memory location referenced by the name ```a```, and the second line update the value to ```2``` in that same memory location. But this is not how things work in Python.
 
-**In Python, a variable is a name used to refer to an object stored somewhere in memory.**  The same statement ```variable = value``` decides which object(value) the name is going to refer to. In the same sequence above, the first line makes **a** points to to the object with value **1**, and the second line points the variable **a** to an object with value **2**.
+**In Python, a variable is a name used to refer to an object stored somewhere in memory.**  The same statement ```variable = value``` decides which object(value) the name is going to refer to. In the same sequence above, the first line makes ```a``` points to to the object with value ```1```, and the second line points the variable ```a``` to an object with value ```2```.
 
 We can easily verify this by using the built-in functions ```id()``` and ```is```. Conceptually, ```id()``` returns the memory address of an object, and ```is``` check to see if two objects have the same id (aka in the same memory address, instead of check for equal value as ```==``` does).
 
@@ -25,7 +25,7 @@ print id(a)
 #-> 140441894830736
 {% endhighlight %}
 
-We can see that as we rebinds **a**, its id changes, reflecting the fact that **a** now points to a different memory location. To further illustrate the point:
+We can see that as we rebinds ```a```, its id changes, reflecting the fact that ```a``` now points to a different memory location. To further illustrate the point:
 
 {% highlight python %}
 a = 1
@@ -38,7 +38,7 @@ print a is b
 True
 {% endhighlight %}
 
-As we can see, ```b=a``` indeed makes **b** point to the same object as **a** does, and they now have the same id. Knowing this can help us understand why the following code behaves as it does:
+As we can see, ```b=a``` indeed makes ```b``` point to the same object as ```a``` does, and they now have the same id. Knowing this can help us understand why the following code behaves as it does:
 
 {% highlight python %}
 a = [1, 2, 3]

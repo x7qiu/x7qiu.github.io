@@ -4,7 +4,7 @@ title: "Parsing Frames and Packets"
 date: 2018-06-15
 categories: Network
 ---
-As someone who works with frames and packets on a daily basis, a summary about their inner structures and programming interfaces is long overdue. This post is intended to be practical rathr than through, as I will be skipping over things which are (IMO) less significat from a programmer's perspective. (No non-ethernet and non-ip traffic will be discussed; no preamble or SFD on the ethernet frame)
+As someone who works with frames and packets on a daily basis, a summary about their inner structures and programming interfaces is long overdue. This post is intended to be practical rathr than through, as I will be skipping over things which are (IMO) less significat from a programmer's perspective. (No non-ethernet II and non-ip traffic will be discussed; no preamble or SFD on the ethernet frame)
 
 # Overall
 ![packet encapsulation](/assets/tcpip.png)
@@ -19,7 +19,7 @@ bytes:   0 1 2 3 4 5      6 7 8 9 10 11     12 13
 ```
 * Dest.MAC: self-explanatory
 * Src.MAC: self-explanatory
-* Type: specify the L3 protocol. i.e. IPv4, IPv6, ARP, ...
+* Type: For value >= 1536(Ethernet II), this specify the L3 protocol. i.e. IPv4, IPv6, ARP. For value <= 1500(Ether 802), this field is the length of the header.
 
 Examplary Python code to dissect ethernet header (**Linux only**)
 {% highlight python %}
@@ -27,15 +27,18 @@ import socket, sys, struct
 
 eth_len = 14 
 
+def print_mac(mac_string):
+    print(':'.join('%02x'% b for b in mac_string)
+
 try:
     s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
-except socket.error, msg:
-    print 'Socket creation failed. Error Code: ', str(msg[0]), 'message: ', msg[1]
+except socket.error as e:
+    print('Socket creation failed.', e)
     sys.exit()
 
 while True:
     data, addr = s.recvfrom(65565)      
-    eth_header = data[:eth_length]
+    eth_header = data[:eth_len]
     eth_header = struct.unpack('!6s6sh', eth_header)
 
     eth_proto = socket.ntohs(eth_header[2])

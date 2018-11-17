@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "LeetCode Series(1) #array"
+title: "LeetCode Series: Array"
 date: 2018-10-18
 mathjax: true
 categories: Algorithm

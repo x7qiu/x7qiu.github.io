@@ -16,7 +16,7 @@ It can be applied only for problems which admit the concept of a "partial candid
 It is often realized by recursion(but not necessarily). 
 
 # Description & pseudocode
-Think of the problem space as a decision tree, where each node represents a **partial candidate solution**, and every possible **decision** from that node leads to a child node. Backtracking traverses the decision tree in a DFS manner, at each node checking to see if it could possibly lead to a valid solution. If not, it discard all children of that node(pruning), and backtracks to the previous node.
+Think of the search space as a decision tree, where each node represents a **partial candidate solution**, and every possible **decision** from that node leads to a child node. Backtracking traverses the decision tree in a DFS manner, at each node checking to see if it could possibly lead to a valid solution. If not, it discard all children of that node(pruning), and backtracks to the previous node.
 
 There are several incarnations of backtracking algorithms: 
 1. to determine if a problem has a solution 
@@ -27,9 +27,9 @@ There are several incarnations of backtracking algorithms:
 1) determine if a solution exists
 {% highlight python %}
 def Solve(node):
-    decisions = get_decions(node)       # get available decisons for this node
-    if no decisions:
+    if reach_leaf_condition:
         return is_solution(node)
+    decisions = get_decions(node)       # get available decisons for this node
     for decision in decisions:
         make_decision(node, decision)   # make a decision, node now becomes one of its children node 
         if no_break_constraint(node):   # pruning part   
@@ -60,19 +60,20 @@ def Solve(node):
 3) find all solutions
 {% highlight python %}
 def Solve(node):
-    results = []
-    decisions = get_decions(node)       
-    if no decisions:
+    res = []
+    solveHelper(node, res)
+    return res
+
+def solveHealper(node, res):
+    if reach_leaf_condition:
         if is_solution(node):
-            results.append(node)
-        else:
-            return False
+            res.append(node)
+    decisions = get_decions(node)      
     for decision in decisions:
         make_decision(node, decision)   
         if no_break_constraint(node):   
-            if Solve(node):
-        unmake_decision(node, decision)
-    
+            Solve(node):
+        unmake_decision(node, decision)  
 {% endhighlight %}
 
 

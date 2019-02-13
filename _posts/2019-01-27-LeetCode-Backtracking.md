@@ -40,6 +40,8 @@ def Solve(node):
     return False
 {% endhighlight %}
 
+**Note**: Often times you can pass the ``decisions`` as a function parameter, and update them after making a choice for each child node instead of computing from scratch. For an example, see the last solution to the Permutation problem below.
+
 2) find one solution or return False if none exists
 {% highlight python %}
 def Solve(node):
@@ -61,14 +63,14 @@ def Solve(node):
 3) find all solutions
 {% highlight python %}
 def Solve(node):
-    res = []
-    solveHelper(node, res)
+    res = []                # to save all the solutions
+    solveHelper(node, res)  # kickoff function
     return res
 
 def solveHealper(node, res):
     if reach_leaf_condition():
         if is_solution(node):
-            res.append(node)
+            res.append(node)    # populate res with valid solutions
 
     decisions = get_decions(node)      
     for decision in decisions:
@@ -78,6 +80,7 @@ def solveHealper(node, res):
         unmake_decision(node, decision)  
 {% endhighlight %}
 
+**Note**: It's a common trick to use a kickstart function for an extra parameter. Here because we want to save all the solutions, we need our recursive function to somehow remember the state when a solution condition is met. To do so, we give it a ``res`` parameter and only populate it when the desired condition is met.
 ## 46. Permutation
 # Description & Example
 Given a collection of distinct integers, return all possible permutations.
@@ -105,9 +108,9 @@ It is clear that we should somehow use recursion. The typical pattern is to eith
     2. Solve the subproblem(s) using recursion      # trivial
     3. Somehow put the answers to subproblem(s) together to solve the original problem
 
-After some thinking, it is not difficult to see that for every permutation of length ``n``, if we look past the first element, the remaining part is also a permutation of length ``n-1``. Conversely, if we want to generate a longer permutaion from a short one, we can simply put the missing element at each position of our short permutation.
+It is not difficult to see that for every **permutation of length n**, if we look past the **first element**, the remaining part is also a **permutation of length (n-1)**. Knowing we can get **ALL** the (n-1)-permutation for free by the power of recursion, we look for ways to rebuild the n-permutations with them. 
 
-For example, suppose we have all the permutations of [2, 3], i.e. ``[2, 3] and [3, 2]``, and want to get the permutations of [1, 2, 3]. We can put the number ``1`` on the **1st, 2rd and 3rd** index of ``[2, 3]`` to get ``[1, 2, 3], [2, 1, 3] and [2, 3, 1]``. We can repeat the process on ``[3, 2]`` to get the remaining permutations.
+The key insight is that we can **insert the first element at all positions of the (n-1)-permutation to get an n-permutation**. For example, suppose we want to get the permutations of [1, 2, 3]. Here the first element is ``1``, and the n-1 permutations are ``[2, 3]`` and ``[3, 2]``. We place ``1`` on all positions of ``[2, 3]``, resulting in ``[1, 2, 3]``, ``[2, 1, 3]`` and ``[2, 3, 1]``. We then repeat the same steps on ``[3, 2]`` to get the rest of the n-permutations. A quick check ensures no repeated answers would be generated from this approach.
 
 Code:
 {% highlight python %}
@@ -125,4 +128,59 @@ def permute(nums):
                 return sols
 {% endhighlight %}
 
+**Note**: Importantly We don't need the ``unmake_decision()`` step here because slicing creates a new list in Python so the original one is never changed.
+
 Runtime:
+
+Space:
+
+# Second Look
+It's quite interesting that I started to tackle this problem knowing it's under the "backtracking" category, yet the solution I came with up has nothing to do with that. It's just plain old recursion. I couldn't really model the problem in the form of a decision tree, untill I watched the stanford 106B class lectures on string permutation. **The trick is to treat the numbers as possible choices and an extra parameter, initially empty, to represent the choices we have made thus far**. We need a kickoff function for the extra parameter, which is convinient since we will need one for saving all the solutions anyways.
+
+{% highlight python %}
+def permute(nums):
+    ans = []
+    permuteHelper([], nums, ans)
+    return ans
+    
+def permuteHelper(sofar, rest, ans):
+    if rest == []:
+        ans.append(sofar)
+    for i in range(len(rest)):
+        permuteHelper(sofar+rest[i], rest[:i]+rest[i+1:], ans)
+{% endhighlight %}
+
+![permutation of 1,2,3](/assets/permutation.png)
+
+Runtime:
+
+Space:
+
+# Third Look
+It turns out there are many more interesting ways to generate permutations, many of them beyond the scope of this post. I will however cover another one because I find the idea extremely elegant. 
+
+{% highlight python %}
+def perm(nums, k=0):
+   if k == len(nums):
+      print nums
+   else:
+      for i in range(k, len(nums)):
+         nums[k], nums[i] = nums[i] ,nums[k]
+         perm(nums, k+1)
+         nums[k], nums[i] = nums[i], nums[k]
+{% endhighlight %}
+
+Forget for a minute that this code only prints the permutations instead of saving them all in a container(IMO it's shorter and easier to understand this way). When I first looked at this code I couldn't really make sense of how it works despite the structural similarity to our previous solution. In that solution we kept two set of numbers: ``sofar`` representing the choices we've made and ``rest`` representing the choices avaiable. In making each choice we remove the number from ``rest`` and put it in ``sofar``. 
+
+It took me a while to realize that this solution does exactly the same thing, but in one array. It uses ``k`` as a seperator, such that ``num[:k]`` corresponds to the ``sofar`` set and ``nums[k:]`` corresponds to the ``rest`` set. In making a choice, say nums[i], we 
+1. make sure $ i \ge k $ courtesy of ``for i in range(k, len(nums))`` 
+2. transfer it from ``rest`` to ``sofar`` by ``nums[k], nums[i] = nums[i], nums[k]``
+3. increase ``k`` by 1 to indicate that we've made a choice
+4. check if ``k`` reaches the end of array, this is the same as checking ``rest == []``
+5. unmake any change from step3, since this time we are not creating a new list
+
+# reference:
+
+https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1188/lectures/Lecture11/Lecture11.pdf
+
+

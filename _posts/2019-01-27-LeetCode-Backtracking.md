@@ -143,7 +143,7 @@ It's interesting that I started working on this problem knowing it's under the "
 * The character 'D' followed by all permutations of "ABCE"
 * The character 'E' followed by all permutations of "ABCD"
 
-As the recursion proceeds, the number of prefix characters increases, and the length of following permutations decrease. Notice however that this problem takes slightly different argument compared to the original problem. As always, we use a wrapper function to make it consistent, which is convinient since we will need one for saving all the solutions anyways.
+As the recursion proceeds, the number of prefix characters increases, and the length of following permutations decrease. Logically we can treat the prefix as decisions we've alread made so far (initially empty), and the rest as candidate decisions (initially the entire string/numbers to be permutated). Notice however that this problem takes slightly different arguments compared to the original problem. As always, we use a wrapper function to make it consistent, which is convinient since we will need one for saving all the solutions anyways.
 
 {% highlight python %}
 def permute(nums):

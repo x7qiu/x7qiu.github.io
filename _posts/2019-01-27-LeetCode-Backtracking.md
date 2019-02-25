@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "LeetCode Series: Backtracking"
+title: "LeetCode::Backtracking::Permutation"
 date: 2019-01-27
 mathjax: true
 categories: Algorithm
@@ -135,7 +135,15 @@ Runtime:
 Space:
 
 # Second Look
-It's quite interesting that I started to tackle this problem knowing it's under the "backtracking" category, yet the solution I came with up has nothing to do with that. It's just plain old recursion. I couldn't really model the problem in the form of a decision tree, untill I watched the stanford 106B class lectures on string permutation. **The trick is to treat the numbers as possible choices and an extra parameter, initially empty, to represent the choices we have made thus far**. We need a kickoff function for the extra parameter, which is convinient since we will need one for saving all the solutions anyways.
+It's interesting that I started working on this problem knowing it's under the "backtracking" category, yet the solution I came with up has nothing to do with it. Just plain old recursion. I couldn't really model the problem in the form of a decision tree untill reading work done by others. The key recursive insight is this: in case of the string "ABCDE", the permutations consists of the following:
+    
+* The character 'A' followed by all permutations of "BCDE"
+* The character 'B' followed by all permutations of "ACDE"
+* The character 'C' followed by all permutations of "ABDE"
+* The character 'D' followed by all permutations of "ABCE"
+* The character 'E' followed by all permutations of "ABCD"
+
+As the recursion proceeds, the number of prefix characters increases, and the length of following permutations decrease. Notice however that this problem takes slightly different argument compared to the original problem. As always, we use a wrapper function to make it consistent, which is convinient since we will need one for saving all the solutions anyways.
 
 {% highlight python %}
 def permute(nums):

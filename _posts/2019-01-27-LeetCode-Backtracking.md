@@ -155,7 +155,7 @@ def permuteHelper(sofar, rest, ans):
     if rest == []:
         ans.append(sofar)
     for i in range(len(rest)):
-        permuteHelper(sofar+rest[i], rest[:i]+rest[i+1:], ans)
+        permuteHelper(sofar+[rest[i]], rest[:i]+rest[i+1:], ans)
 {% endhighlight %}
 
 ![permutation of 1,2,3](/assets/permutation.png)
@@ -168,27 +168,69 @@ Space:
 It turns out there are many more interesting ways to generate permutations, many of them beyond the scope of this post. I will however cover another one because I find the idea extremely elegant. 
 
 {% highlight python %}
-def perm(nums, k=0):
-   if k == len(nums):
-      print nums
-   else:
-      for i in range(k, len(nums)):
-         nums[k], nums[i] = nums[i] ,nums[k]
-         perm(nums, k+1)
-         nums[k], nums[i] = nums[i], nums[k]
+def permute(nums):
+    ans = []
+    permuteHelper(nums, 0, ans)
+    return ans
+
+def permuteHelper(nums, k, ans):
+    if k == len(nums):
+        ans.append(nums[:])     # important
+        return 
+    for i in range(k, len(nums)):
+        nums[k], nums[i] = nums[i] ,nums[k]
+        permuteHelper(nums, k+1, ans)
+        nums[k], nums[i] = nums[i], nums[k]
 {% endhighlight %}
 
-Forget for a minute that this code only prints the permutations instead of saving them all in a container(IMO it's shorter and easier to understand this way). When I first looked at this code I couldn't really make sense of how it works despite the structural similarity to our previous solution. In that solution we kept two set of numbers: ``sofar`` representing the choices we've made and ``rest`` representing the choices avaiable. In making each choice we remove the number from ``rest`` and put it in ``sofar``. 
-
-It took me a while to realize that this solution does exactly the same thing, but in one array. It uses ``k`` as a seperator, such that ``num[:k]`` corresponds to the ``sofar`` set and ``nums[k:]`` corresponds to the ``rest`` set. In making a choice, say nums[i], we 
+It took me a while to realize that this solution does exactly the same thing, but in place. It uses ``k`` as a seperator, such that ``num[:k]`` corresponds to the ``sofar`` set and ``nums[k:]`` corresponds to the ``rest`` set. In making a choice, say nums[i], we 
 1. make sure $ i \ge k $ courtesy of ``for i in range(k, len(nums))`` 
 2. transfer it from ``rest`` to ``sofar`` by ``nums[k], nums[i] = nums[i], nums[k]``
 3. increase ``k`` by 1 to indicate that we've made a choice
 4. check if ``k`` reaches the end of array, this is the same as checking ``rest == []``
 5. unmake any change from step3, since this time we are not creating a new list
 
+Only works on mutable data .
+
 # reference:
 
 https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1188/lectures/Lecture11/Lecture11.pdf
 
+## 77. Combinations
+# Description & Example
+Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
 
+Example:
+
+{% highlight python %}
+Input: n = 4, k = 2
+
+Output:
+[
+    [1, 2],
+    [1, 3],
+    [1, 4],
+    [2, 3],
+    [2, 4],
+    [3, 4]
+]
+{% endhighlight %}
+
+# Initial Analysis
+It's natural to modify the backtracking algorithm for permutations to obtain combinations. The only care we need is not to generate repeated answers, such as ``[2, 4]`` and ``[4, 2]``. My initial thought is to keep each solution a strictly increasing list of numbers, which is trivial and easy to understnad. But after some time I realized it's more elegant and efficient to handle such cases in the ``making decision`` phase. 
+
+To illustrate the idea, suppose we have the numbers ``[1, 2, 3, 4]``. Back in our permutation algorithm, we choose the first number to be ``1`` and recursively generate all the permutation of ``[2, 3, 4]`` to append after it. Then we move on to choose ``2`` as the first number followed by all permutations of ``[1, 3, 4]``. 
+
+{% highlight python %}
+def combine(n, k):
+    res = [ ]
+    comb([ ], list(range(1, n+1)), k, res)
+    return res
+    
+def comb(sofar, rest, k, res):
+    if len(sofar) == k:
+       res.append(sofar)
+    else:
+        for i in range(len(rest)):
+            comb(sofar + [rest[i]], rest[i+1:], k, res)
+{% endhighlight %}

@@ -6,7 +6,7 @@ mathjax: true
 categories: Algorithm
 ---
 ## Backtracking
-# About
+# Introduction
 Backtracking is a general approach to solving **constraint-satisfaction problems** without trying all possibilities.
 
 It incrementally builds candidates solutions, and abadons a solution("backtracks") as soon as it determines the candidate cannot be valid.
@@ -101,7 +101,7 @@ Output:
 ]
 {% endhighlight %}
 
-# Initial Analysis
+# Solution 1
 It is clear that we should somehow use recursion. The typical pattern is to either divide and conquer or decrease and conquer. Namely:
 
     1. Divide or decrease the original problem into subproblem(s)
@@ -132,16 +132,23 @@ def permute(nums):
 
 Runtime:
 
+$$
+\begin{align}
+T(n) &= T(n-1) + (n-1)!\cdot n \cdot \theta(n)  \\
+     &= T(n-1) + n! \cdot cn
+\end{align}
+$$
+
 Space:
 
-# Second Look
-It's interesting that I started working on this problem knowing it's under the "backtracking" category, yet the solution I came with up has nothing to do with it. Just plain old recursion. I couldn't really model the problem in the form of a decision tree untill reading work done by others. The key recursive insight is this: in case of the string "ABCDE", the permutations consists of the following:
+# Solution 2
+It's interesting that I started working on this problem knowing it's under the "backtracking" category, yet the solution I came with up has nothing to do with it. Just plain old recursion. I couldn't really model the problem in the form of a decision tree untill reading work done by others. The key recursive insight is this: in case of the array "12345", the permutations consists of the following:
     
-* The character 'A' followed by all permutations of "BCDE"
-* The character 'B' followed by all permutations of "ACDE"
-* The character 'C' followed by all permutations of "ABDE"
-* The character 'D' followed by all permutations of "ABCE"
-* The character 'E' followed by all permutations of "ABCD"
+* The number '1' followed by all permutations of "2345"
+* The number '2' followed by all permutations of "1345"
+* The number '3' followed by all permutations of "1245"
+* The number '4' followed by all permutations of "1235"
+* The number '5' followed by all permutations of "1234"
 
 As the recursion proceeds, the number of prefix characters increases, and the length of following permutations decrease. Logically we can treat the prefix as decisions we've alread made so far (initially empty), and the rest as candidate decisions (initially the entire string/numbers to be permutated). Notice however that this problem takes slightly different arguments compared to the original problem. As always, we use a wrapper function to make it consistent, which is convinient since we will need one for saving all the solutions anyways.
 
@@ -162,9 +169,16 @@ def permuteHelper(sofar, rest, ans):
 
 Runtime:
 
+$$
+\begin{align}
+T(n) &= n \cdot [T(n-1) + \theta(n)]    \\
+     &= nT(n-1) + cn^2
+\end{align}
+$$
+
 Space:
 
-# Third Look
+# Solution 3
 It turns out there are many more interesting ways to generate permutations, many of them beyond the scope of this post. I will however cover another one because I find the idea extremely elegant. 
 
 {% highlight python %}
@@ -192,18 +206,14 @@ It took me a while to realize that this solution does exactly the same thing, bu
 
 Only works on mutable data .
 
-# reference:
-
-https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1188/lectures/Lecture11/Lecture11.pdf
-
 ## 77. Combinations
 # Description & Example
-Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
+Given a collection of distinct numbers and a number k, return all possible k-combinations. 
 
 Example:
 
 {% highlight python %}
-Input: n = 4, k = 2
+Input: nums = [1, 2, 3, 4], k = 2
 
 Output:
 [
@@ -216,21 +226,52 @@ Output:
 ]
 {% endhighlight %}
 
-# Initial Analysis
-It's natural to modify the backtracking algorithm for permutations to obtain combinations. The only care we need is not to generate repeated answers, such as ``[2, 4]`` and ``[4, 2]``. My initial thought is to keep each solution a strictly increasing list of numbers, which is trivial and easy to understnad. But after some time I realized it's more elegant and efficient to handle such cases in the ``making decision`` phase. 
+**Note**: I slightly modified the original leetcode problem to make it a more general. In the original problem we have as arguments ``n`` and ``k`` and is asked to generate k-combinations from numbers 1 to n. Not only does it unnecessarily implies that the elements are in sorted order, this notation makes it impossible to refer to numbers with starting point other than 1, such as ``2, 3, ..., n``.
 
-To illustrate the idea, suppose we have the numbers ``[1, 2, 3, 4]``. Back in our permutation algorithm, we choose the first number to be ``1`` and recursively generate all the permutation of ``[2, 3, 4]`` to append after it. Then we move on to choose ``2`` as the first number followed by all permutations of ``[1, 3, 4]``. 
+# Solution 1 
+The underlying idea is very similar to that of generating permutations, with one important difference: **do not look back**. This means when making a decision, we should only choose from a pool of decisions that have not been made before (not couting recursive-subproblems) to avoid repitition.
+
+For example, suppose we want to generate all 3-combinations of [1, 2, 3, 4, 5]. We start by choosing ``1`` as our leading element and append with all the 2-combinations of ``[2, 3, 4, 5]``. Then we move on to choose 2 as our leading element, and follow it by all the 2-combinations of only ``[3, 4, 5]``. 
 
 {% highlight python %}
-def combine(n, k):
+def combine(nums, k):
     res = [ ]
-    comb([ ], list(range(1, n+1)), k, res)
+    combineHelper([ ], nums, k, res)
     return res
     
-def comb(sofar, rest, k, res):
+def combineHelper(sofar, rest, k, res):
     if len(sofar) == k:
        res.append(sofar)
+    elif len(sofar) + len(rest) < k:    # make sure there are enough elements
+        return 
     else:
         for i in range(len(rest)):
-            comb(sofar + [rest[i]], rest[i+1:], k, res)
+            # permuteHelper(sofar+[rest[i]], rest[:i]+rest[i+1:], ans)
+            # Only look ahead
+            combineHelper(sofar + [rest[i]], rest[i+1:], k, res)
 {% endhighlight %}
+
+![3-combinations of [1,2,3,4,5]](/assets/combination.png)
+
+# Solution 2
+{% highlight python %}
+def combine(nums, k):
+    sols = []
+    if k <= 1:      # base case
+        return [[num] for num in nums]
+    else:
+        for i in range(len(nums)):  
+            if len(nums) - i  >= k:                 
+                combs = combine(nums[i+1:], k-1)        
+                for comb in combs:
+                    sol = [nums[i]] + comb
+                    sols.append(sol)
+        return sols
+{% endhighlight %}
+
+# reference:
+
+https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1188/lectures/Lecture11/Lecture11.pdf
+<<Programming Abstractions>>, Book by Stanford
+https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
+

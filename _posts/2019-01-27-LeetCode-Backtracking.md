@@ -135,7 +135,29 @@ Runtime:
 $$
 \begin{align}
 T(n) &= T(n-1) + (n-1)!\cdot n \cdot \theta(n)  \\
-     &= T(n-1) + n! \cdot cn
+     &= T(n-1) + cn \cdot n!                    \\
+     &= T(n-2) + cn \cdot n! + c(n-1) \cdot (n-1)!  \\
+     &= c \cdot [n \cdot n! + (n-1) \cdot (n-1)! + \cdots + 1]   \\
+\end{align}
+$$
+
+There is a beautiful trick to solve for this recurrence. Notice that 
+
+$$
+\begin{align}
+n \cdot n! &= (n+1-1) \cdot n!     \\
+            &= (n+1) \cdot n! - n!  \\
+            &= (n+1)! - n!
+\end{align}
+$$
+
+Apply this repetitively on each term, we get:
+
+$$
+\begin{align}
+T(n) &= c \cdot [(n+1)! - n! + n! - (n-1)! + \cdots - 1]    \\
+     &= c \cdot [(n+1)! - 1]    \\
+     &= \theta((n+1)!)
 \end{align}
 $$
 

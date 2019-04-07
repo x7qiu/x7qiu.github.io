@@ -1,142 +1,153 @@
 ---
 layout: post
-title: "LeetCode::SinglyLinkedList"
+title: "LeetCode::LinkedList(Part1)"
 date: 2019-03-23
 mathjax: true
 categories: Algorithm
 ---
 # Introduction
-Conceptually, most SLL algorithms are very similar to those applied on arrays. The defining difference is that when modifying a node, often times **you also need to have reference to the node just before or after it**. Take for example a simple example of deleting the node ``B`` from list ``A->B->C``. After you identify where ``B`` is, you still need to keep a reference of ``A`` in order to write ``A->next = B->next``. 
+This post will cover some of the programming challenges on singly linked list from LeetCode. In particular, we will only focus on problems that can be solved without modifying the list, as an introduction to the class of these problems and to showcase some of the unique . In part2 and part3, we will be 
 
-A slightly more challenging example is to reverse the same list. Not only do you need to know where ``A`` and ``B`` to write ``B->next = A``, you also need to know where ``C`` is in order to continue traversing the list, after you've altered the original ``B->next``.
-
-This immediately brings code complexity, as you need to take care of more variables and treat special cases carefully. The head node obviously has no previous node, and the ``NULL`` node has no node after it. Identifying what variables to keep, how to update them in a loop, and when to stop are keys to solve SLL problems.
-
-# Tricks 
-
-## 206. Reverse Linked List
+## 141. Linked List Cycle
 # Description & Example
-Reverse a singly linked list.
+Given a linked list, determine if it has a cycle in it.
 
-Example:
+# Solution 1 (Tortoise and Hare)
+{% highlight c %}
+bool hasCycle(struct ListNode *head) {
+    struct ListNode* slow, *fast;
+    slow = head, fast = head;
 
-Input:  ``1->2->3->4->5->NULL``
+    while(fast && fast->next){
+        slow = slow->next;
+        fast = fast->next->next;
 
-Output: ``5->4->3->2->1->NULL``
-
-# Solution 1
-The idea is straightfoward in Python:
-{% highlight python %}
-def reverseList(head):
-    pre, cur = None, head
-    while cur:
-        cur.next, pre, cur = pre, cur, cur.next
-    return pre
-{% endhighlight %}
-
-In languages that doesn't support such syntax, an extra variable is used to store the information lost when reversing a link.
-
-{% highlight C %}
-struct ListNode* reverseList(struct ListNode* head) {
-    if (!head)
-        return head;
-    struct ListNode* prev = NULL;
-    struct ListNode* cur = head;
-
-    
-    while (cur){
-        struct ListNode* temp = cur->next;
-        cur->next = prev;
-        prev = cur;
-        cur = temp;
+        if (slow == fast)
+            return true;
     }
-    return prev;
+    return false;  
 }
 {% endhighlight %}
 
-There are methods to use less than 3 variables, but space efficiency is not enough to justify the lost code readbility IMO, so I will not cover them here. 
+This is a well-known solution to a well-studied problem. I will only give a simple explanation of why the fast and slow pointers will eventually meet if there is a cycle.
 
-# Solution 2
-We can also solve this recursively. 
+Suppose a cycle exists, then by the time the tortoise gets in it, the hare will already be somewhere inside. From that point, the hare will be catching up to the tortoise in the cycle. Since the hare is running twice as fast, it is guarantueed to be one step closer each loop, eventually meeting the tortoise. 
 
-{% highlight C %}
-struct ListNode* reverseList(struct ListNode* head) {
-    if (head == NULL || head->next == NULL){
-        return head;
-    }
-    
-    struct ListNode* tail = reverseList(head->next);
-    (head->next)->next = head;
-    head->next = NULL;
-    return tail;
-}
-{% endhighlight %}
+# Solution 2 (Brent's algorithm)
 
-After the first recursive call, we have:
-{% highlight python %}
-1->2<-3<-4<-5
-   ↓
-  NULL 
-{% endhighlight %}
-while ``tail`` is at 5 and ``head`` still at 1. We fix the ``1->2`` link with ``(head->next)->next = head`` and add ``1->NULL``.
 
-## 21. Merge Two Sorted Lists
+## 142. Linked List Cycle II
 # Description & Example
-Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.
+Given a linked list, return the node where the cycle begins. If there is no cycle, return null.
 
-Example:
+# Solution
+From [this discussion](https://stackoverflow.com/questions/2936213/explain-how-finding-cycle-start-node-in-cycle-linked-list-work/32190575#32190575)
+![detect start of loop](/assets/detect-loop-start.png)
 
-Input: ``1->2->4->NULL``, ``1->3->4->NULL``
+Suppose we have run the tortoise and hare algorithm and they meet at the meeting point as shown in the image. Note that the tortoise is guranteed to be caught up by the hare within one cycle after it enters the cycle. But the hare could have travelled the cycle ``m`` times before the tortoise enters the cycle. Then we have:
 
-Output: ``1->1-2->3->4->4->NULL``
+* Distance run by tortoise: $x + y$
+* Distance run by hare: $x + m(y+z) + y$
 
-# Solution 1
+Since the hare has been running at twice the speed of the tortoise, we have:
+
+$$
+2(x+y) = x + m(y+z) + y
+$$
+
+Sovling for $x$ gives:
+
+$$
+x = (m-1)(y+z) + z
+$$
+
+What this tells us is that in another scenario, if we have two pinters, one starting at the head of the list and the other starting at somewhere in the cycle and running at the same speed. Then by the time the first pointer enters the cycle (aka travelled a distance of $x$), the second pointer will have moved forward a distance of $z$ relative to its starting position.
+
+Now it should be clear why the following algorithm works:
+
+1. Run the tortoise and hare algorithm. Now both slow and fast pointer are at the meeting point as showin in the image.
+2. Move the slow pointer to the beginning of the list again. Set the fast pointer to be running at the same speed as the slow pointer.
+3. Move both pointer in parallel until they meet. The new meeting point would be at the start of the cycle.
 
 {% highlight c %}
-struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2) {    
-    struct ListNode dummy = {0, NULL};
-    struct ListNode* cur = &dummy;
+struct ListNode *detectCycle(struct ListNode *head) {
+    struct ListNode* slow, *fast;
+    slow = head, fast = head;   
+ 
+    while(fast && fast->next){
+        slow = slow->next;
+        fast = fast->next->next;
         
-
-    while(l1 && l2){
-        if (l1->val <= l2->val){
-            cur->next = l1;
-            l1 = l1->next;
+        if (slow == fast){
+            slow = head;
+            while(slow != fast){
+                slow = slow->next;
+                fast = fast->next;
+            }
+            return slow;
         }
-        else{
-            cur->next = l2;
-            l2 = l2->next;
-        }
-        cur = cur->next;
     }
-    if (!l1){
-        cur->next = l2;
-    }
-    if (!l2){
-        cur->next = l1;
-    }
-    return dummy.next;
+    return NULL;
 }
 {% endhighlight %}
 
-# Solution 2
-As is often the case, the recursive solution is much easier to read.
+## 160. Intersection of Two Linked Lists
+# Description & Example
+Write a program to find the node at which the intersection of two singly linked lists begins.
 
+Notes:
+* If the two linked lists have no intersection at all, return null.
+* You may assume there are no cycles anywhere in the entire linked structure.
+
+# Solution
+There are surprisingly many solutions to this problem, but here I will only present one that's easy to understand. The idea is simple:
+
+1. Traverse the lists and compute their lengths, called it ``lenA`` and ``lenB``
+2. Move the head of the longer list ``abs(lenA-lenB)`` nodes ahead, so that now headA and headB are sitting at the same distance from tail
+3. Traverse headA and headB in parallel and compare the address of each node along the way. If they are equal, it is the intersection point
+
+{% highlight python %}
+def getIntersectionNode(headA, headB):
+        curA,curB = headA,headB
+        lenA,lenB = 0,0
+        while curA is not None:
+            lenA += 1
+            curA = curA.next
+        while curB is not None:
+            lenB += 1
+            curB = curB.next
+        curA,curB = headA,headB
+        if lenA > lenB:
+            for i in range(lenA-lenB):
+                curA = curA.next
+        elif lenB > lenA:
+            for i in range(lenB-lenA):
+                curB = curB.next
+        while curA and id(curA) != id(curB):
+            curA = curA.next
+            curB = curB.next
+        return curA
+{% endhighlight %}
+
+
+## 876. Middle of the Linked List
+# Description & Example
+Return the middle node of a linked list. If there are two middle nodes, return the second one.
+
+# Solution
 {% highlight c %}
-struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2) {
-    if (!l1){
-        return l2;
+struct ListNode* middleNode(struct ListNode* head) {
+    if (head == NULL || head->next == NULL)
+        return head;
+    struct ListNode* slow, *fast;
+    slow = head, fast = head;
+
+    while(fast && fast->next){
+        slow = slow->next;
+        fast = fast->next->next;
     }
-    if (!l2){
-        return l1;
-    }
-    if (l1->val <= l2->val){
-        l1->next = mergeTwoLists(l1->next, l2);
-        return l1;
-    }
-    else{
-        l2->next = mergeTwoLists(l1, l2->next);
-        return l2;
-    }
-}
+    return slow;
 {% endhighlight %}
+
+
+

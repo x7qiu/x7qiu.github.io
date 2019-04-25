@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "LeetCode::LinkedList(Part2)"
-date: 2019-04-24
+date: 2019-04-23
 mathjax: true
 categories: Algorithm
 ---

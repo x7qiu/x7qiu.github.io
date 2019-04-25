@@ -12,7 +12,7 @@ This brings code complexity, as you need to keep track of more variables and tre
 
 1. **Design the inside of ``while`` loop**
 
-    In this step we ignore edge cases and focus on how to modify the body of the list to get the desired result.
+    In this step we ignore edge cases and focus on how to modify the body of the list. A ``cur`` node, initialized as the ``head`` node before we enter the loop, will always be the current node that we are working on.
 
 2. **Decide the break point for the loop**
 
@@ -32,12 +32,12 @@ Input:  ``1->2->3->4->5->NULL``
 
 Output: ``5->4->3->2->1->NULL``
 
-# Solution 1 (Iterative)
+# Solution 1 (Iterative with ``cur`` and ``nex``)
 Let's do the aforementioned steps:
 
 1. **Design the inside of while loop**
 
-    Image somewhere in the middle of the list we need to reverse ``B->C->D->E->...``. At this point we must already have a ``cur`` variable(used to traverse the list) and is pointing at ``B``. It is obvious that we need another variable, ``nex``, as the next element of ``cur`` so that we can reverse the ``B->C`` part with ``nex->next = cur``.  
+    Image somewhere in the middle of the list we need to reverse ``B->C->D->E->...``. At this point we already have a ``cur`` variable pointing at ``B``. It is obvious that we need another variable, ``nex``, as the next element of ``cur`` so that we can reverse the ``B->C`` part with ``nex->next = cur``.  
 
     Continue to loop and things become interesting. What we want now is to let ``cur`` point at C and ``nex`` point at D. But what cannot get a reference to ``D`` anymore because ``C->next`` is now pointing at ``B``. To solve this, we need an extra variable in the loop to store such information.
 
@@ -89,8 +89,30 @@ struct ListNode* reverseList(struct ListNode* head) {
     return cur;
 }{% endhighlight %}
  
+# Solution 2 (Iterative with ``pre`` and ``cur``)
+Instead of traversing the list with a ``cur`` node and a ``nex`` node, we can also loop through the list with ``pre`` and ``cur`` nodes. These two models are essentially the same, withe the obvious exception that you need to initialize ``pre`` to something meaningful. We usually use ``pre`` together with a dummy head node, as we will see later, but here we can just initialize it to ``NULL`` because of how this particular problem works.
 
-# Solution 2 (Iterative)
+{% highlight C %}
+struct ListNode* reverseList(struct ListNode* head) {
+    if (!head)
+        return NULL;
+    struct ListNode* prev = NULL;
+    struct ListNode* cur = head;
+   
+    while (cur){
+        struct ListNode* temp = cur->next;
+        cur->next = prev;
+
+        prev = cur;
+        cur = temp;
+    }
+    return prev;
+}
+{% endhighlight %}
+As you can see, although we have to change the loop condition accordingly, the logic works exactly the same. 
+
+The Python version of the same code is quite a bit shorter:
+
 {% highlight python %}
 def reverseList(head):
     pre, cur = None, head
@@ -98,25 +120,7 @@ def reverseList(head):
         cur.next, pre, cur = pre, cur, cur.next
     return pre
 {% endhighlight %}
-
-In languages that doesn't support such syntax, an extra variable is used to store the information lost when reversing a link.
-
-{% highlight C %}
-struct ListNode* reverseList(struct ListNode* head) {
-    if (!head)
-        return head;
-    struct ListNode* prev = NULL;
-    struct ListNode* cur = head;
-   
-    while (cur){
-        struct ListNode* temp = cur->next;
-        cur->next = prev;
-        prev = cur;
-        cur = temp;
-    }
-    return prev;
-}
-{% endhighlight %}
+This is the most popular solution on LeetCode, is 1 line shorter compared to using ``cur`` and ``nex``, but perfonally I don't like it much. Mainly because such a use of ``pre`` is the most typical and may confuse people. 
 
 # Solution 3 (Recursive)
 {% highlight C %}

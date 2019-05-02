@@ -16,7 +16,7 @@ This brings code complexity, as you need to keep track of more variables and tre
 
 2. **Decide the break point for the loop**
 
-    This will usually be when our ``cur`` node reaches ``NULL``, but exceptions exsist. For example, if we referenced the value of ``cur->next`` node in the loop, since a ``NULL`` node has no value filed, we must break out of the loop when ``cur->next`` is ``NULL``.
+    This will usually be when our ``cur`` node reaches ``NULL``, but exceptions exsist. For example, if we referenced``cur->next->value`` in the loop, since a ``NULL`` node has no value filed, we must break out of the loop when ``cur->next`` is ``NULL``.
 
 3. **Handle edge cases**
 
@@ -95,8 +95,6 @@ Instead of traversing the list with a ``cur`` node and a ``nex`` node, we can al
 
 {% highlight C %}
 struct ListNode* reverseList(struct ListNode* head) {
-    if (!head)
-        return NULL;
     struct ListNode* prev = NULL;
     struct ListNode* cur = head;
    
@@ -131,7 +129,7 @@ struct ListNode* reverseList(struct ListNode* head) {
     }
     
     struct ListNode* tail = reverseList(head->next);
-    (head->next)->next = head;
+    head->next->next = head;
     head->next = NULL;
     return tail;
 }

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "LeetCode::LinkedList(Part2)"
+title: "LeetCode::LinkedList(Part2)-Without Modifying the Head Node"
 date: 2019-04-23
 mathjax: true
 categories: Algorithm
@@ -87,7 +87,8 @@ struct ListNode* reverseList(struct ListNode* head) {
     }
     head->next = NULL;
     return cur;
-}{% endhighlight %}
+}
+{% endhighlight %}
  
 # Solution 2 (Iterative with ``pre`` and ``cur``)
 Instead of traversing the list with a ``cur`` node and a ``nex`` node, we can also loop through the list with ``pre`` and ``cur`` nodes. These two models are essentially the same, withe the obvious exception that you need to initialize ``pre`` to something meaningful. We usually use ``pre`` together with a dummy head node, as we will see later, but here we can just initialize it to ``NULL`` because of how this particular problem works.
@@ -184,63 +185,4 @@ struct ListNode* deleteDuplicates(struct ListNode* head) {
 }
 {% endhighlight %}
 
-## 21. Merge Two Sorted Lists
-# Description & Example
-Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.
 
-Example:
-
-Input: ``1->2->4->NULL``, ``1->3->4->NULL``
-
-Output: ``1->1-2->3->4->4->NULL``
-
-# Solution 1 (Iterative)
-
-{% highlight c %}
-struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2) {    
-    struct ListNode dummy = {0, NULL};
-    struct ListNode* cur = &dummy;
-        
-
-    while(l1 && l2){
-        if (l1->val <= l2->val){
-            cur->next = l1;
-            l1 = l1->next;
-        }
-        else{
-            cur->next = l2;
-            l2 = l2->next;
-        }
-        cur = cur->next;
-    }
-    if (!l1){
-        cur->next = l2;
-    }
-    if (!l2){
-        cur->next = l1;
-    }
-    return dummy.next;
-}
-{% endhighlight %}
-
-# Solution 2 (Recursive)
-As is often the case, the recursive solution is much easier to read.
-
-{% highlight c %}
-struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2) {
-    if (!l1){
-        return l2;
-    }
-    if (!l2){
-        return l1;
-    }
-    if (l1->val <= l2->val){
-        l1->next = mergeTwoLists(l1->next, l2);
-        return l1;
-    }
-    else{
-        l2->next = mergeTwoLists(l1, l2->next);
-        return l2;
-    }
-}
-{% endhighlight %}

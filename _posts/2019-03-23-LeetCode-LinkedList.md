@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "LeetCode::LinkedList(Part1)"
+title: "LeetCode::LinkedList(Part1)-Without Modifying the List"
 date: 2019-03-23
 mathjax: true
 categories: Algorithm
 ---
 # Introduction
-This post will cover some of the programming challenges on singly linked list from LeetCode. In particular, we will only focus on problems that can be solved without modifying the list, as an introduction to the class of these problems and to showcase some of the unique . In part2 and part3, we will be 
+This post will cover some of the programming challenges on singly linked list from LeetCode. In particular, I will only focus on problems that can be solved without modifying the list itself. The more challenging and (argubly) interesting problems will be discussed in the second and third part of the series.
 
 ## 141. Linked List Cycle
 # Description & Example

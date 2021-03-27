@@ -21,10 +21,11 @@ The second argument we need to provide is the **socket type**. Also from the man
 
 The third argument is the **protocol** field. Usually there is only one supported protocol given the socket family and type, so this field can be omitted. Since we are working with raw sockets and want to capture all protocols, the special value `0x0003` is used.
 
-# Step2. Bind()?
+# Step2. bind()?
 A Bind() operation is unnecessary here. When working with packet sockets, by default all packets of the specified protocol will be passed to the socket(incoming and outgoing, on all interfaces). If we only want packets from a specific interface or address, we can use `bind` as a filter.
 
-# Step3. Recvfrom() and Parsing
+# Step3. recvfrom() and Parsing
+
 
 ## A Quick Example 
 

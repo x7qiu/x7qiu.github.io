@@ -7,7 +7,7 @@ categories: Algorithm
 ---
 ## Introduction
 ------
-Most linked list algorithms are conceptually quite straightforward. The main difficult lies in that fact that when modifying a node in the list, often times you also **need to have reference to the node just before it or after it**. Take for example a simple case of deleting the node ``B`` from list ``A->B->C``. After you identify where ``B`` is, you still need to keep a reference of ``A`` in order to write ``A->next = B->next``. 
+Most linked list algorithms are logially quite straightforward. The main difficult lies in that fact that when working on a node in the list, often times you also **need to have reference to the node just before it or after it**. Take for example a simple case of deleting the node ``B`` from list ``A->B->C``. After you identify where ``B`` is, you still need to keep a reference of ``A`` in order to write ``A->next = B->next``. 
 
 This brings code complexity, as you need to keep track of more variables and treat special cases carefully. The head node obviously has no previous node and the ``NULL`` node has no node after it. I usually approach a problem in the following steps:
 
@@ -28,8 +28,7 @@ Given a sorted linked list, delete all duplicates such that each element appear 
 
 Example:
 
-Input: ``1->1->2->3->3``
-
+Input: ``1->1->2->3->3`` \\
 Output: ``1->2->3``
 
 # Solution 1 (Iterative)
@@ -62,6 +61,29 @@ struct ListNode* deleteDuplicates(struct ListNode* head) {
 }
 {% endhighlight %}
 
+# 328. Odd Even Linked List
+Given a singly linked list, group all odd nodes together followed by the even nodes. Please note here we are talking about the node index and not the value in the nodes.
+
+Example:
+
+Input: ``1->2->3->4->5->NULL`` \\
+Output: ``1->3->5->2->4->NULL``
+
+Note:
+* The relative order inside both the even and odd groups should remain as it was in the input.
+* The first node is considered odd, the second node even and so on 
+* You should try to do it in place.
+
+# Solution
+1. loop
+
+first-> next = first->next->next
+can we do it in two passes? No
+so add second
+whats the break point
+whats the base case
+
+
 ## When you need the node **Before** ``cur``
 ------
 
@@ -70,8 +92,7 @@ Given a sorted linked list, delete all nodes that have duplicate numbers, leavin
 
 Example:
 
-Input: ``1->2->3->3->4->4->5``
-
+Input: ``1->2->3->3->4->4->5`` \\
 Output: ``1->2->5`` 
 
 # Solution 1 (Iterative)
@@ -102,8 +123,7 @@ Remove all elements from a linked list of integers that have value ``val``.
 
 Example:
 
-Input: ``1->2->6->3->4->5->6``, val = 6
-
+Input: ``1->2->6->3->4->5->6``, val = 6 \\
 Output: ``1->2->3->4->5``
 
 # Solution 1
@@ -126,17 +146,16 @@ struct ListNode* removeElements(struct ListNode* head, int val) {
 }
 {% endhighlight %}
 
-## When you need the node **After** ``cur``
+## When you need nodes **Before** and **After** ``cur``
 ------
-haha
+put ``struct ListNode* after`` in the loop, so your while loop doesnt break. 
 
 # 206. Reverse Linked List
 Reverse a singly linked list.
 
 Example:
 
-Input:  ``1->2->3->4->5->NULL``
-
+Input:  ``1->2->3->4->5->NULL`` \\
 Output: ``5->4->3->2->1->NULL``
 
  
@@ -150,11 +169,11 @@ struct ListNode* reverseList(struct ListNode* head) {
     struct ListNode* cur = head;
    
     while (cur){
-        struct ListNode* temp = cur->next;
+        struct ListNode* after = cur->next;
         cur->next = prev;
 
         prev = cur;
-        cur = temp;
+        cur = after;
     }
     return prev;
 }
@@ -201,11 +220,10 @@ You may not modify the values in the list's nodes, only nodes itself may be chan
 
 Example:
 
-Input: ``1->2->3->4``
-
+Input: ``1->2->3->4`` \\
 Output: ``2->1->4->3``
 
-# Solution 1
+# Solution 1 (Iterative)
 {% highlight c %}
 struct ListNode* swapPairs(struct ListNode* head){
     struct ListNode dummy = {-1, head};
@@ -213,10 +231,10 @@ struct ListNode* swapPairs(struct ListNode* head){
     struct ListNode* cur = head;
     
     while(cur && cur->next){
-        struct ListNode* nex = cur->next;
-        cur->next = nex->next;
-        pre->next = nex;
-        nex->next = cur;
+        struct ListNode* after = cur->next;
+        cur->next = after->next;
+        pre->next = after;
+        after->next = cur;
         
         pre = pre->next->next;
         cur = pre->next;
@@ -226,4 +244,16 @@ struct ListNode* swapPairs(struct ListNode* head){
 }
 {% endhighlight %}
 
-
+# Solution 2 (Recursive)
+{% highlight c %}
+struct ListNode* swapPairs(struct ListNode* head) {
+    if (head==NULL || head->next == NULL)
+        return head;
+    
+    struct ListNode* rest = swapPairs(head->next->next);
+    struct ListNode* newhead = head->next;
+    newhead->next = head;
+    head->next = rest;
+    return newhead;
+}
+{% endhighlight %}

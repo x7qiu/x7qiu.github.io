@@ -33,9 +33,9 @@ def TwoSum(nums, target):
                 d[val] = index    
 {% endhighlight %}
 
-Runtime: O(n)
+Runtime: $O(n)$
 
-Space: O(n)
+Space: $O(n)$
 
 ## 15. 3Sum
 # Description

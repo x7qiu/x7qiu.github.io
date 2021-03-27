@@ -5,8 +5,7 @@ date: 2019-01-27
 mathjax: true
 categories: Algorithm
 ---
-## Backtracking
-# Introduction
+# Introduction 
 Backtracking is a general approach to solving **constraint-satisfaction problems** without trying all possibilities.
 
 It incrementally builds candidates solutions, and abadons a solution("backtracks") as soon as it determines the candidate cannot be valid.
@@ -27,24 +26,31 @@ There are several incarnations of backtracking algorithms:
 1) determine if a solution exists
 {% highlight python %}
 def Solve(node):
-    if reach_leaf_condition():
-        return is_solution(node)
+    if node_is_leaf(node):
+        return node_is_solution(node)
 
     decisions = get_decions(node)       # get available decisons for this node
     for decision in decisions:
         make_decision(node, decision)   # make a decision, update node
-        if no_break_constraint(node):   # pruning part   
+        if not node_break_constraint(node):   # pruning 
             if Solve(node):
                 return True
         unmake_decision(node, decision) # restore state to beginning of loop
     return False
 {% endhighlight %}
 
-**Note**: Often times you can pass the ``decisions`` as a function parameter, and update them after making a choice for each child node instead of computing from scratch. For an example, see the last solution to the Permutation problem below.
+**Note**: You can also pass the ``decisions`` as a function parameter and update them after making a choice for each child node instead of computing from scratch. 
 
 2) find one solution or return False if none exists
 {% highlight python %}
 def Solve(node):
+    if node_is_leaf(node):
+        
+
+
+
+
+
     decisions = get_decions(node)       
     if no decisions:
         if is_solution(node):
@@ -53,7 +59,7 @@ def Solve(node):
             return False
     for decision in decisions:
         make_decision(node, decision)   
-        if no_break_constraint(node):   
+        if not node_break_constraint(node):   
             if Solve(node):
                 return Solve(node):
         unmake_decision(node, decision)
@@ -64,32 +70,30 @@ def Solve(node):
 {% highlight python %}
 def Solve(node):
     res = []                # to save all the solutions
-    solveHelper(node, res)  # kickoff function
+    solveHelper(node, res)  # kickstart function for more parameters
     return res
 
 def solveHealper(node, res):
-    if reach_leaf_condition():
-        if is_solution(node):
+    if node_is_leaf():
+        if node_is_solution(node):
             res.append(node)    # populate res with valid solutions
 
     decisions = get_decions(node)      
     for decision in decisions:
         make_decision(node, decision)   
-        if no_break_constraint(node):   
+        if not node_break_constraint(node):   
             Solve(node):
         unmake_decision(node, decision)  
 {% endhighlight %}
 
 **Note**: It's a common trick to use a kickstart function for an extra parameter. Here because we want to save all the solutions, we need our recursive function to somehow remember the state when a solution condition is met. To do so, we give it a ``res`` parameter and only populate it when the desired condition is met.
-## 46. Permutation
-# Description & Example
+
+# 46. Permutation
 Given a collection of distinct integers, return all possible permutations.
 
 Example:
-
-{% highlight python %}
+```
 Input: [1, 2, 3]
-
 Output:
 [
     [1, 2, 3],
@@ -99,7 +103,7 @@ Output:
     [3, 1, 2],
     [3, 2, 1]
 ]
-{% endhighlight %}
+```
 
 # Solution 1
 It is clear that we should somehow use recursion. The typical pattern is to either divide and conquer or decrease and conquer. Namely:
@@ -228,8 +232,7 @@ It took me a while to realize that this solution does exactly the same thing, bu
 
 Only works on mutable data .
 
-## 77. Combinations
-# Description & Example
+# 77. Combinations
 Given a collection of distinct numbers and a number k, return all possible k-combinations. 
 
 Example:
@@ -293,7 +296,7 @@ def combine(nums, k):
 
 # reference:
 
-https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1188/lectures/Lecture11/Lecture11.pdf
-<<Programming Abstractions>>, Book by Stanford
-https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
+https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1188/lectures/Lecture11/Lecture11.pdf   \\
+<<Programming Abstractions>>, Book by Stanford      \\
+https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/ 
 
